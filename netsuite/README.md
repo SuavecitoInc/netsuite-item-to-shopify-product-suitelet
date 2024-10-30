@@ -2,9 +2,9 @@
 
 > SuiteScript 2.1
 
-The SuiteLet (SP_ShopifyProductSuiteLet) injects the React Bundle via an inline html field. The React bundle's file cabinet url will need to be set on the script deployment (`custscript_sp_mw1r_react_bundle`).
+The SuiteLet (SP_ShopifyProductSuiteLet) injects the React Bundle via an inline html field. The React bundle's file cabinet url will need to be set on the script deployment (`custscript_sp_shopify_product_bundle_url`).
 
-The React front end uses a RESTLet as its API (SP_ShopifyProductAPI).
+The React front end uses a RESTLet as its API (SP_ShopifyProductAPI). The server endpoint will need to be added via the script paramater `custscript_sp_shopify_product_endpoint`.
 
 Actions:
 
