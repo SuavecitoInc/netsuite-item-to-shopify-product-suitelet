@@ -2,9 +2,69 @@
 
 > SuiteScript 2.1
 
+## Setup
+
 The SuiteLet (SP_ShopifyProductSuiteLet) injects the React Bundle via an inline html field. The React bundle's file cabinet url will need to be set on the script deployment (`custscript_sp_shopify_product_bundle_url`).
 
-The React front end uses a RESTLet as its API (SP_ShopifyProductAPI). The server endpoint will need to be added via the script paramater `custscript_sp_shopify_product_endpoint`.
+The React front end uses a RESTLet as its API (SP_ShopifyProductAPI). This RESTLet takes 2 params. The server endpoint `custscript_sp_shopify_product_endpoint` and secret key `custscript_sp_shopify_product_secret_id`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Script</th>
+      <th>Type</th>
+      <th>Params</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SP_ShopifyProductSuiteLet</td>
+      <td>SuiteLet</td>
+      <td>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>custscript_sp_shopify_product_bundle_url</td>
+              <td>The React Bundle's URL</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td>SP_ShopifyProductAPI</td>
+      <td>RESTLet</td>
+      <td>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>custscript_sp_shopify_product_endpoint</td>
+              <td>Server Endpoint</td>
+            </tr>
+            <tr>
+              <td>custscript_sp_shopify_product_secret_id</td>
+              <td>The API Secret's ID</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## Usage
 
 Actions:
 
