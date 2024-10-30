@@ -436,6 +436,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     shopifyStore: string,
     product: ShopifyProduct
   ) => {
+    // TODO: Update with payload digest signature for security
     log.debug('createProduct', product);
     const endpoint = runtime.getCurrentScript().getParameter({
       name: 'custscript_sp_shopify_product_endpoint',
