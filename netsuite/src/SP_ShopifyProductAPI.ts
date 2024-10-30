@@ -451,8 +451,6 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       encoding: crypto.Encoding.UTF_8,
     });
 
-    log.debug('secretKey', secretKey);
-
     const body = {
       shopifyStore,
       product,
@@ -472,15 +470,11 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       outputEncoding: encode.Encoding.BASE_64,
     });
 
-    log.debug('digest', digest);
-
     const headerObj = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
       'X-ShopifyProduct-Hmac-Sha256': digest,
     };
-
-    log.debug('headerObj', headerObj);
 
     const response = await https.post.promise({
       url: endpoint,
