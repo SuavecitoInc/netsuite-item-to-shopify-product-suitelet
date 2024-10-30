@@ -1,0 +1,50 @@
+{
+  "name": "netsuite-to-shopify-suitelet",
+  "version": "0.0.1",
+  "description": "A NetSuite SuiteLet to create Shopify product from a NetSuite item record.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack serve --open",
+    "build": "npm run tailwind && webpack --mode production",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "tailwind": "npx tailwindcss -i ./src/style.css -o ./src/app.css",
+    "tailwind:watch": "npx tailwindcss -i ./src/style.css -o ./src/app.css --watch"
+  },
+  "keywords": [],
+  "author": "j-Riv <jriv@suavecito.com>",
+  "license": "ISC",
+  "dependencies": {
+    "highlight.js": "^11.10.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-syntax-highlighter": "^15.6.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
+    "@eslint/js": "^9.10.0",
+    "@types/react": "^18.3.7",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.10.0",
+    "eslint-plugin-react": "^7.36.1",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.47",
+    "postcss-loader": "^8.1.1",
+    "postcss-preset-env": "^10.0.7",
+    "prettier-plugin-tailwindcss": "^0.6.8",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^3.4.13",
+    "typescript": "5.6.2",
+    "typescript-eslint": "^8.6.0",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  }
+}

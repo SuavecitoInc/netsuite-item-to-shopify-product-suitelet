@@ -1,0 +1,21 @@
+{
+  "name": "netsuite-to-shopify-suitelet",
+  "version": "0.0.1",
+  "description": "A NetSuite SuiteLet to create Shopify product from a NetSuite item record.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "author": "j-Riv <jriv@suavecito.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@hitc/netsuite-types": "^2024.2.2",
+    "eslint": "^9.10.0",
+    "globals": "^15.9.0",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.6.0"
+  }
+}
