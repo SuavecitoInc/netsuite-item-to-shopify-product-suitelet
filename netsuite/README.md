@@ -133,3 +133,15 @@ Actions:
     ```
 
   - Response
+
+    ```javascript
+    {
+      "success": true,
+      "data": {
+        "product": {
+          "legacyResourceId": "123456789"
+        },
+        "error": null
+      }
+    }
+    ```
