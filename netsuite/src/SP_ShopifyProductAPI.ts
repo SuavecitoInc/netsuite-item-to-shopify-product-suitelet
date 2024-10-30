@@ -20,6 +20,7 @@ import {
   checkRequiredFields,
 } from './lib/SP_ShopifyProductUtils';
 import type {
+  CreatedProductResponse,
   ItemResult,
   ShopifyProduct,
   ShopifyProductVariant,
@@ -487,7 +488,9 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       details: response.body,
     });
 
-    return JSON.parse(response.body);
+    const jsonResponse = JSON.parse(response.body) as CreatedProductResponse;
+
+    return jsonResponse;
   };
 
   log.debug('API CONTEXT', JSON.stringify(context, null, 2));
@@ -512,6 +515,11 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     if (action === 'CREATE_PRODUCT') {
       const { shopifyStore, product } = payload;
       const response = await createProduct(shopifyStore, product);
+
+      if (response?.error) {
+        throw new Error(response.error);
+      }
+
       return {
         success: true,
         data: response,
@@ -526,6 +534,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
   } catch (err: any) {
     return {
       success: false,
+      data: null,
       error: err.message || 'Something went wrong',
     };
   }

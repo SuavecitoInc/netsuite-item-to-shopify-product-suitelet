@@ -80,8 +80,13 @@ export type ShopifyProductVariant = {
       };
     };
   };
-  // sku: string;
-  // weight: number;
-  // weightUnit: string;
   barcode: string;
+};
+
+export type CreatedProductResponse = {
+  product: {
+    url: string;
+    legacyResourceId: string;
+  } | null;
+  error?: string;
 };

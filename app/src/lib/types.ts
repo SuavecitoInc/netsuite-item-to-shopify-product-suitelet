@@ -4,6 +4,17 @@ export type GetPreviewResponse = {
   error?: string;
 };
 
+export type CreateProductResponse = {
+  success: boolean;
+  data: {
+    product: {
+      url: string;
+      legacyResourceId: string;
+    };
+  };
+  error?: string;
+};
+
 export type ShopifyProduct = {
   vendor: string;
   title: string;

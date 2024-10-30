@@ -139,6 +139,7 @@ Actions:
       "success": true,
       "data": {
         "product": {
+          "url": 'https://admin.shopify.com/store/some-store/products/123456789'
           "legacyResourceId": "123456789"
         },
         "error": null
