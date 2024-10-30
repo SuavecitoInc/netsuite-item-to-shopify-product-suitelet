@@ -5,6 +5,8 @@
 
 import { EntryPoints } from 'N/types';
 import * as log from 'N/log';
+import * as crypto from 'N/crypto';
+import * as encode from 'N/encode';
 import * as record from 'N/record';
 import * as search from 'N/search';
 import * as https from 'N/https';
@@ -436,21 +438,54 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     shopifyStore: string,
     product: ShopifyProduct
   ) => {
-    // TODO: Update with payload digest signature for security
-    log.debug('createProduct', product);
     const endpoint = runtime.getCurrentScript().getParameter({
       name: 'custscript_sp_shopify_product_endpoint',
     }) as string;
+    const apiKeyId = runtime.getCurrentScript().getParameter({
+      name: 'custscript_sp_shopify_product_secret_id',
+    }) as string;
+
+    // create hmac
+    const secretKey = crypto.createSecretKey({
+      guid: apiKeyId,
+      encoding: crypto.Encoding.UTF_8,
+    });
+
+    log.debug('secretKey', secretKey);
+
+    const body = {
+      shopifyStore,
+      product,
+    };
+
+    const hmac = crypto.createHmac({
+      algorithm: crypto.HashAlg.SHA256,
+      key: secretKey,
+    });
+
+    hmac.update({
+      input: JSON.stringify(body),
+      inputEncoding: encode.Encoding.UTF_8,
+    });
+
+    const digest = hmac.digest({
+      outputEncoding: encode.Encoding.BASE_64,
+    });
+
+    log.debug('digest', digest);
+
+    const headerObj = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-ShopifyProduct-Hmac-Sha256': digest,
+    };
+
+    log.debug('headerObj', headerObj);
+
     const response = await https.post.promise({
       url: endpoint,
-      body: JSON.stringify({
-        shopifyStore,
-        product,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+      body: JSON.stringify(body),
+      headers: headerObj,
     });
 
     log.debug({
