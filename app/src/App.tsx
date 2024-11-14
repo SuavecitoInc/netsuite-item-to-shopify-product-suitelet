@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import Loading from './components/Loading';
 import CodeSnippet from './components/CodeSnippet';
-import { STORES } from './lib/const';
+import Config from './config/shopify';
 import { fetchAPI } from './lib/utils';
 import type { GetPreviewResponse, CreateProductResponse } from './lib/types';
 
@@ -17,7 +17,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentView, setCurrentView] = useState<View>('fetch');
-  const [shopifyStore, setShopifyStore] = useState(STORES.RETAIL.value);
+  const [shopifyStore, setShopifyStore] = useState(Config.stores.RETAIL.value);
   const [sku, setSku] = useState('');
   const [preview, setPreview] = useState<any>(null);
   const [product, setProduct] = useState<null | Product>(null);
@@ -109,7 +109,7 @@ function App() {
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   onChange={e => setShopifyStore(e.target.value)}
                 >
-                  {Object.values(STORES).map(store => (
+                  {Object.values(Config.stores).map(store => (
                     <option key={store.value} value={store.value}>
                       {store.text}
                     </option>
