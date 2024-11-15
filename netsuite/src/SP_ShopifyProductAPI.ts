@@ -378,6 +378,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       // check if item is matrix,
       // if matrix get subitems and create variants array on item obj
       if (isMatrix) {
+        log.debug('isMatrix', isMatrix);
         const variants = createVariants(
           parentId,
           fieldId.priceLevel,
@@ -389,8 +390,8 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
         const defaultVariant: ShopifyProductVariant = {
           optionValues: [
             {
-              optionName: 'Default',
-              name: 'Default',
+              optionName: 'Title',
+              name: 'Default Title',
             },
           ],
           price: item[fieldId.priceLevel] as string,
@@ -411,6 +412,8 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
             fieldId.compareAtPrice
           ) as string;
         }
+
+        log.debug('createDefaultVariant', defaultVariant);
 
         product.variants = [defaultVariant];
       }
