@@ -2,7 +2,7 @@
 
 > A NetSuite SuiteLet to create Shopify product from a NetSuite item record.
 
-This SuiteLet depends on this [API Server](https://github.com/SuavecitoInc/suavecito-api) to proxy requests to Shopify.
+This SuiteLet depends on this [AWS Lambda](https://github.com/SuavecitoInc/netsuite-to-shopify-product-lambda) to proxy requests to Shopify.
 
 <div align="center">
 	<img src="./screenshots/netsuite-item-to-shopify-product.jpg" alt="Screenshot" width="800">
