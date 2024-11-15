@@ -73,7 +73,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     BRAND: 'custitem_sp_brand',
     RETAIL_PRICE: 'baseprice',
     RETAIL_COMPARE_PRICE: 'custitem_fa_shpfy_compare_at_price',
-    RETAIL_DESCRIPTION: 'description',
+    RETAIL_DESCRIPTION: 'custitem_fa_shpfy_prod_description',
     RETAIL_TAGS: 'custitem_fa_shpfy_tags',
     WHOLESALE_PRICE: 'price2',
     WHOLESALE_COMPARE_PRICE: 'custitem_fa_shpfy_compare_at_price_ws',

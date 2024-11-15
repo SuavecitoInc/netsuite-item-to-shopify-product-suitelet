@@ -114,7 +114,8 @@ export function stripInlineStyles(html: string) {
     .replace(ids, '')
     .replace(classes, '')
     .replace(dir, '')
-    .replace(role, '');
+    .replace(role, '')
+    .replace(/ >/g, '>');
 }
 
 export function checkRequiredFields(itemObj: ShopifyProduct) {
