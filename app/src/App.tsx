@@ -150,13 +150,22 @@ function App() {
               <div className="mb-5">
                 <CodeSnippet snippet={preview} />
               </div>
-              <button
-                type="button"
-                onClick={createProduct}
-                className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
-              >
-                Create Product
-              </button>
+              <div className="flex flex-row gap-2">
+                <button
+                  type="button"
+                  onClick={createProduct}
+                  className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
+                >
+                  Create Product
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="w-full rounded-lg bg-slate-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
 
