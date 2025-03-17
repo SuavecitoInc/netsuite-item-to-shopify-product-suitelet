@@ -91,7 +91,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     WAREHOUSE_COMPARE_PRICE: 'custitem_fa_shpfy_compare_at_price_wh',
     WAREHOUSE_DESCRIPTION: 'custitem_fa_shpfy_prod_description_wh',
     WAREHOUSE_TAGS: 'custitem_fa_shpfy_tags_wh',
-    PRODUCT_TYPE: 'custitem_sp_product_type',
+    PRODUCT_TYPE: 'custitem_fa_shpfy_prodtype',
     SIZE: 'custitem_sp_size',
     COLOR: 'custitem_sp_color',
   };
