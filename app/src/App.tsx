@@ -38,8 +38,6 @@ function App() {
       }
 
       const snippet = response.data;
-      snippet.descriptionHtml =
-        snippet.descriptionHtml.substring(0, 120) + '...';
 
       setPreview(snippet);
       setIsLoading(false);
