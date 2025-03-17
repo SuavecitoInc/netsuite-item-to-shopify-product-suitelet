@@ -1,11 +1,15 @@
 import React from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import js from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+
 import {
   solarizedlight,
   // tomorrow,
   // okaidia,
   // coy,
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+SyntaxHighlighter.registerLanguage('javascript', js);
 
 type Props = {
   snippet: string;

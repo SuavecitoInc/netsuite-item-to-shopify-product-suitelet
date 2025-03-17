@@ -10,7 +10,12 @@ export default [
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   {
-    ignores: ['webpack.config.js', 'postcss.config.js', 'tailwind.config.js'],
+    ignores: [
+      'webpack.config.js',
+      'webpack.config.prod.js',
+      'postcss.config.js',
+      'tailwind.config.js',
+    ],
   },
   {
     settings: {

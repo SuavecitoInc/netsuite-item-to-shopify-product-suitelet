@@ -5,7 +5,7 @@ import Config from './config/shopify';
 import { fetchAPI } from './lib/utils';
 import type { GetPreviewResponse, CreateProductResponse } from './lib/types';
 
-import './App.css';
+import './style.css';
 
 type View = 'fetch' | 'preview' | 'created' | 'error';
 type Product = {
@@ -95,7 +95,7 @@ function App() {
           {currentView === 'fetch' && (
             <div className="max-w-sm">
               <h3 className="font-bold uppercase">Fetch Product</h3>
-              <div className="mb-5">
+              <div className="mb-5!">
                 <label
                   htmlFor="stores"
                   className="mb-2 block text-sm font-medium text-gray-900"
@@ -114,7 +114,7 @@ function App() {
                   ))}
                 </select>
               </div>
-              <div className="mb-5">
+              <div className="mb-5!">
                 <label
                   htmlFor="sku"
                   className="mb-2 block text-sm font-medium text-gray-900"
@@ -135,7 +135,7 @@ function App() {
                 type="button"
                 onClick={getPreview}
                 disabled={sku === ''}
-                className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
+                className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none sm:w-auto"
               >
                 Search
               </button>
@@ -145,21 +145,21 @@ function App() {
           {currentView === 'preview' && preview && (
             <div className="max-w-full">
               <h3 className="font-bold uppercase">Preview Product</h3>
-              <div className="mb-5">
+              <div className="mb-5!">
                 <CodeSnippet snippet={preview} />
               </div>
               <div className="flex flex-row gap-2">
                 <button
                   type="button"
                   onClick={createProduct}
-                  className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
+                  className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none sm:w-auto"
                 >
                   Create Product
                 </button>
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="w-full rounded-lg bg-slate-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
+                  className="w-full rounded-lg bg-slate-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800 focus:ring-4 focus:ring-blue-300 focus:outline-none sm:w-auto"
                 >
                   Cancel
                 </button>
@@ -170,7 +170,7 @@ function App() {
           {currentView === 'created' && (
             <div className="max-w-sm">
               {product && (
-                <div className="mb-5">
+                <div className="mb-5!">
                   <h3 className="font-bold uppercase">Product Created</h3>
                   <div
                     className="mb-4 flex items-center rounded-lg bg-green-50 p-4 text-sm text-green-800"
@@ -203,7 +203,7 @@ function App() {
                 </div>
               )}
               {error && (
-                <div className="mb-5">
+                <div className="mb-5!">
                   <h3 className="font-bold uppercase">
                     Error Creating Product
                   </h3>
@@ -231,7 +231,7 @@ function App() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
+                className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none sm:w-auto"
               >
                 Reset
               </button>
