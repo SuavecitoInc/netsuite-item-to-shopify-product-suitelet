@@ -31,7 +31,7 @@ function App() {
         sku,
       });
 
-      console.log('RESPONSE', response);
+      console.log('getPreview RESPONSE', JSON.stringify(response, null, 2));
 
       if (!response.success) {
         throw new Error(response.error);
@@ -42,7 +42,10 @@ function App() {
       setPreview(snippet);
       setIsLoading(false);
       setCurrentView('preview');
-    } catch (err: unknown) {
+    } catch (err: any) {
+      const errorMessage =
+        err.message || 'An error occurred while fetching the product preview';
+      setError(errorMessage);
       console.error(err);
       setIsLoading(false);
     }
@@ -60,7 +63,7 @@ function App() {
         product: preview,
       });
 
-      console.log('RESPONSE', response);
+      console.log('createProduct RESPONSE', JSON.stringify(response, null, 2));
 
       if (!response.success) {
         throw new Error(response.error);
@@ -72,8 +75,10 @@ function App() {
       setCurrentView('created');
     } catch (err: any) {
       console.error(err);
+      const errorMessage =
+        err.message || 'An error occurred while creating the product';
       setIsLoading(false);
-      setError(err.message);
+      setError(errorMessage);
       setCurrentView('created');
     }
   }, [shopifyStore, preview]);
@@ -131,6 +136,32 @@ function App() {
                   required
                 />
               </div>
+              {error && (
+                <div className="mb-5!">
+                  <h3 className="font-bold uppercase">
+                    Error Fetching Product
+                  </h3>
+                  <div
+                    className="mb-4 flex items-center rounded-lg bg-red-50 p-4 text-sm text-red-800"
+                    role="alert"
+                  >
+                    <svg
+                      className="me-3 inline h-4 w-4 flex-shrink-0"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                    </svg>
+                    <span className="sr-only">Info</span>
+                    <div>
+                      <span className="font-medium">Error!</span> {error} <br />
+                      Please try again.
+                    </div>
+                  </div>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={getPreview}

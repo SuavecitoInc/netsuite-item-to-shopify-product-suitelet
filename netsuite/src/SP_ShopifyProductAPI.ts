@@ -46,13 +46,13 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       text: 'WHOLESALE',
       value: 'wholesale',
     },
-    PROFESSIONAL: {
-      text: 'PROFESSIONAL',
-      value: 'professional',
+    MEXICO: {
+      text: 'MEXICO',
+      value: 'mexico',
     },
-    WAREHOUSE: {
-      text: 'WAREHOUSE',
-      value: 'warehouse',
+    CANADA: {
+      text: 'CANADA',
+      value: 'canada',
     },
     BARBER_CART: {
       text: 'BARBER CART',
@@ -315,21 +315,20 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       fieldId.productDescription = FIELDS.WHOLESALE_DESCRIPTION;
       fieldId.shopifyTags = FIELDS.WHOLESALE_TAGS;
       fieldId.compareAtPrice = FIELDS.WHOLESALE_COMPARE_PRICE;
-    } else if (store === shopifyStore.WAREHOUSE.value) {
-      fieldId.priceLevel = FIELDS.WAREHOUSE_PRICE;
-      fieldId.productDescription = FIELDS.WAREHOUSE_DESCRIPTION;
-      fieldId.shopifyTags = FIELDS.WAREHOUSE_TAGS;
-      fieldId.compareAtPrice = FIELDS.WAREHOUSE_COMPARE_PRICE;
-    } else if (store === shopifyStore.PROFESSIONAL.value) {
-      fieldId.priceLevel = FIELDS.PRO_PRICE;
-      fieldId.productDescription = FIELDS.PRO_DESCRIPTION;
-      fieldId.shopifyTags = FIELDS.PRO_TAGS;
-      fieldId.compareAtPrice = FIELDS.PRO_COMPARE_PRICE;
     } else if (store === shopifyStore.BARBER_CART.value) {
       fieldId.priceLevel = FIELDS.RETAIL_PRICE; // custitem_fa_shpfy_cc_price
       fieldId.productDescription = FIELDS.CC_DESCRIPTION;
       fieldId.shopifyTags = FIELDS.CC_TAGS;
       fieldId.compareAtPrice = FIELDS.RETAIL_COMPARE_PRICE; // custitem_fa_shpfy_compare_at_price_cc
+    } else if (
+      store === shopifyStore.CANADA.value ||
+      store === shopifyStore.MEXICO.value
+    ) {
+      // mexico and canada values dont matter as we will manually update them, so use retail for now
+      fieldId.priceLevel = FIELDS.RETAIL_PRICE;
+      fieldId.productDescription = FIELDS.RETAIL_DESCRIPTION;
+      fieldId.shopifyTags = FIELDS.RETAIL_TAGS;
+      fieldId.compareAtPrice = FIELDS.RETAIL_COMPARE_PRICE;
     } else {
       throw new Error('Invalid Store');
     }
@@ -348,12 +347,14 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       id: parentId,
       isDynamic: false,
     });
+    log.debug('itemRecord', itemRecord);
     // create shopify product object
     const tags = (itemRecord.getValue(fieldId.shopifyTags) as string)
       .split(' ')
       .join('')
       .split(',')
       .filter(tag => tag !== '');
+    log.debug('tags', tags);
     const product: ShopifyProduct = {
       vendor: itemRecord.getText(FIELDS.BRAND) as string,
       title: itemRecord.getValue(FIELDS.DISPLAY_NAME) as string,
@@ -364,9 +365,11 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       ),
       variants: [],
     };
+    log.debug('product', product);
 
     // check required for all required fields
     const itemErrors = checkRequiredFields(product);
+    log.debug('itemErrors', itemErrors);
     // if errors display error and return false
     if (itemErrors.length > 0) {
       return {
@@ -509,6 +512,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     if (action === 'GET_PREVIEW') {
       const { shopifyStore, sku } = payload;
       const response = createPreviewObject(shopifyStore, sku);
+      log.debug('GET_PREVIEW RESPONSE', JSON.stringify(response, null, 2));
       return {
         success: true,
         data: response,
@@ -518,6 +522,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     if (action === 'CREATE_PRODUCT') {
       const { shopifyStore, product } = payload;
       const response = await createProduct(shopifyStore, product);
+      log.debug('CREATE_PRODUCT RESPONSE', JSON.stringify(response, null, 2));
 
       if (response?.error) {
         throw new Error(response.error);
@@ -535,6 +540,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       error: 'Invalid action',
     };
   } catch (err: any) {
+    log.debug('ERROR', err.message);
     return {
       success: false,
       data: null,
