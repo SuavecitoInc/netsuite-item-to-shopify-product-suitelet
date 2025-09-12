@@ -223,6 +223,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
         FIELDS.CC_DESCRIPTION,
         FIELDS.CC_PRICE,
         FIELDS.CC_COMPARE_PRICE,
+        FIELDS.PRODUCT_TYPE,
       ],
     });
 
@@ -297,6 +298,55 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     return sortVariants(variants);
   };
 
+  const getMissingParentFields = (
+    parentID: string,
+    productTypeField: string,
+    descriptionField: string
+  ) => {
+    // get variants
+    const childItemSearch = search.create({
+      type: 'item',
+      columns: [productTypeField, descriptionField],
+    });
+
+    childItemSearch.filters = [
+      search.createFilter({
+        name: 'parent',
+        operator: search.Operator.IS,
+        values: parentID,
+      }),
+      search.createFilter({
+        name: 'isinactive',
+        operator: search.Operator.IS,
+        values: ['F'],
+      }),
+    ];
+
+    const childResultSet = childItemSearch.run();
+    const childResults = childResultSet.getRange({
+      start: 0,
+      end: 25,
+    });
+
+    // loop through child items and get missing fields
+    let productType: string | null | undefined = null;
+    let descriptionHtml: string | null | undefined = null;
+
+    childResults.forEach((item, index) => {
+      if (!productType) {
+        productType = item.getText(productTypeField) as string;
+      }
+      if (!descriptionHtml) {
+        descriptionHtml = item.getValue(descriptionField) as string;
+      }
+    });
+
+    return {
+      productType,
+      descriptionHtml,
+    };
+  };
+
   const buildShopifyProduct = (store: string, item: ItemResult) => {
     const fieldId = {
       priceLevel: '',
@@ -334,7 +384,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     }
 
     log.debug('is.matrix', item.matrix);
-    const isMatrix = item.matrix;
+    const isMatrix = item.matrix as boolean;
     log.debug('isMatrix', isMatrix);
     log.debug('type', item.type);
 
@@ -355,6 +405,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       .split(',')
       .filter(tag => tag !== '');
     log.debug('tags', tags);
+
     const product: ShopifyProduct = {
       vendor: itemRecord.getText(FIELDS.BRAND) as string,
       title: itemRecord.getValue(FIELDS.DISPLAY_NAME) as string,
@@ -365,10 +416,11 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       ),
       variants: [],
     };
+
     log.debug('product', product);
 
     // check required for all required fields
-    const itemErrors = checkRequiredFields(product);
+    const itemErrors = checkRequiredFields(product, isMatrix);
     log.debug('itemErrors', itemErrors);
     // if errors display error and return false
     if (itemErrors.length > 0) {
@@ -377,56 +429,95 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
         data: null,
         error: 'The following fields need to be set: ' + itemErrors.join(', '),
       };
-    } else {
-      // check if item is matrix,
-      // if matrix get subitems and create variants array on item obj
-      if (isMatrix) {
-        log.debug('isMatrix', isMatrix);
-        const variants = createVariants(
-          parentId,
-          fieldId.priceLevel,
-          fieldId.compareAtPrice
-        );
-        product.variants = variants;
-      } else {
-        // single item
-        const defaultVariant: ShopifyProductVariant = {
-          optionValues: [
-            {
-              optionName: 'Title',
-              name: 'Default Title',
-            },
-          ],
-          price: item[fieldId.priceLevel] as string,
-          inventoryItem: {
-            sku: item.itemid as string,
-            measurement: {
-              weight: {
-                value: Number(item.weight),
-                unit: convertWeightUnit(item.weightunit),
-              },
-            },
-          },
-          barcode: item.upccode as string,
-        };
-
-        if (itemRecord.getValue(fieldId.compareAtPrice)) {
-          defaultVariant.compareAtPrice = itemRecord.getValue(
-            fieldId.compareAtPrice
-          ) as string;
-        }
-
-        log.debug('createDefaultVariant', defaultVariant);
-
-        product.variants = [defaultVariant];
+    }
+    // check if item is matrix,
+    // if matrix get subitems and create variants array on item obj
+    if (isMatrix) {
+      log.debug('isMatrix', isMatrix);
+      const variants = createVariants(
+        parentId,
+        fieldId.priceLevel,
+        fieldId.compareAtPrice
+      );
+      product.variants = variants;
+      // check if variants have productType and descriptionHtml set
+      let hasMissingParentFields = false;
+      if (!product.productType || product.productType === '') {
+        hasMissingParentFields = true;
       }
 
-      return {
-        success: true,
-        data: product,
-        error: null,
+      if (!product.descriptionHtml || product.descriptionHtml === '') {
+        hasMissingParentFields = true;
+      }
+
+      if (hasMissingParentFields) {
+        const missingParentFields = getMissingParentFields(
+          parentId,
+          FIELDS.PRODUCT_TYPE,
+          fieldId.productDescription
+        );
+
+        log.debug('missingParentFields', missingParentFields);
+        if (missingParentFields.productType) {
+          product.productType = missingParentFields.productType as string;
+        }
+
+        if (missingParentFields.descriptionHtml) {
+          product.descriptionHtml = stripInlineStyles(
+            String(missingParentFields.descriptionHtml)
+          );
+        }
+      }
+      // check required fields again this time set is matrix to false
+      const itemErrors = checkRequiredFields(product, false);
+      log.debug('itemErrors', itemErrors);
+      // if errors display error and return false
+      if (itemErrors.length > 0) {
+        return {
+          success: false,
+          data: null,
+          error:
+            'The following fields need to be set: ' + itemErrors.join(', '),
+        };
+      }
+    } else {
+      // single item
+      const defaultVariant: ShopifyProductVariant = {
+        optionValues: [
+          {
+            optionName: 'Title',
+            name: 'Default Title',
+          },
+        ],
+        price: item[fieldId.priceLevel] as string,
+        inventoryItem: {
+          sku: item.itemid as string,
+          measurement: {
+            weight: {
+              value: Number(item.weight),
+              unit: convertWeightUnit(item.weightunit),
+            },
+          },
+        },
+        barcode: item.upccode as string,
       };
+
+      if (itemRecord.getValue(fieldId.compareAtPrice)) {
+        defaultVariant.compareAtPrice = itemRecord.getValue(
+          fieldId.compareAtPrice
+        ) as string;
+      }
+
+      log.debug('createDefaultVariant', defaultVariant);
+
+      product.variants = [defaultVariant];
     }
+
+    return {
+      success: true,
+      data: product,
+      error: null,
+    };
   };
 
   const createPreviewObject = (store: string, sku: string) => {
