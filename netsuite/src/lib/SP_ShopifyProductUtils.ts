@@ -118,10 +118,19 @@ export function stripInlineStyles(html: string) {
     .replace(/ >/g, '>');
 }
 
-export function checkRequiredFields(itemObj: ShopifyProduct) {
+export function checkRequiredFields(
+  itemObj: ShopifyProduct,
+  isMatrix: boolean
+) {
   const itemObjKeys = Object.keys(itemObj);
   const itemObjErrors = [];
-  const exclude = ['tags', 'descriptionHtml'];
+  let exclude = ['tags', 'descriptionHtml'];
+  // if is matrix exclude description and productType
+  // theres a bug in NetSuite where it sometimes does not allow the saving / updating of matrix items,
+  // so users will skip the adding of these fields in NetSuite. Let's check the child items for these fields instead.
+  if (isMatrix) {
+    exclude = [...exclude, 'descriptionHtml', 'productType'];
+  }
   itemObjKeys.forEach(key => {
     if (!exclude.includes(key)) {
       if (itemObj[key] === '' || (key === 'weight' && itemObj[key] === 0)) {
