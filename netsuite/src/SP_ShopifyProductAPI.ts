@@ -36,7 +36,7 @@ type PostContext = {
   };
 };
 
-export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
+export const post: EntryPoints.RESTlet.post = async requestBody => {
   const shopifyStore = {
     RETAIL: {
       text: 'RETAIL',
@@ -57,6 +57,10 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     BARBER_CART: {
       text: 'BARBER CART',
       value: 'barbercart',
+    },
+    TRES_NOIR: {
+      text: 'TRES NOIR',
+      value: 'tresnoir',
     },
   };
 
@@ -83,10 +87,10 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     CC_COMPARE_PRICE: 'custitem_fa_shpfy_compare_at_price_cc',
     CC_DESCRIPTION: 'custitem_fa_shpfy_prod_description_cc',
     CC_TAGS: 'custitem_fa_shpfy_tags_cc',
-    PRO_PRICE: 'custitem_fa_shpfy_professional_price',
-    PRO_COMPARE_PRICE: 'custitem_fa_shpfy_compare_at_price_pro',
-    PRO_DESCRIPTION: 'custitem_fa_shpfy_prod_description_pro',
-    PRO_TAGS: 'custitem_fa_shpfy_tags_pro',
+    TN_PRODUCT_TYPE: 'custitem_fa_shpfy_tn_prodtype',
+    TN_EVENTS_PRICE: 'custitem_sp_shpfy_tn_events_price',
+    TN_DESCRIPTION: 'custitem_fa_shpfy_tn_description',
+    TN_TAGS: 'custitem_fa_shpfy_tn_tags',
     WAREHOUSE_PRICE: 'custitem_fa_shpfy_warehouse_price',
     WAREHOUSE_COMPARE_PRICE: 'custitem_fa_shpfy_compare_at_price_wh',
     WAREHOUSE_DESCRIPTION: 'custitem_fa_shpfy_prod_description_wh',
@@ -96,13 +100,9 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     COLOR: 'custitem_sp_color',
   };
 
-  const recordType = {
-    Assembly: record.Type.ASSEMBLY_ITEM,
-    InvtPart: record.Type.INVENTORY_ITEM,
-    Kit: record.Type.KIT_ITEM,
-  };
+  type ItemReturn = ItemResult | null;
 
-  const getItemData = (sku: string): ItemResult => {
+  const getItemData = (sku: string): ItemReturn => {
     // item search
     const itemSearch = search.create({
       type: 'item',
@@ -122,8 +122,10 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
         FIELDS.BRAND,
         FIELDS.WAREHOUSE_PRICE,
         FIELDS.WAREHOUSE_DESCRIPTION,
-        FIELDS.PRO_PRICE,
-        FIELDS.PRO_DESCRIPTION,
+        FIELDS.TN_PRODUCT_TYPE,
+        FIELDS.TN_EVENTS_PRICE,
+        FIELDS.TN_DESCRIPTION,
+        FIELDS.TN_TAGS,
         FIELDS.CC_DESCRIPTION,
         FIELDS.CC_PRICE,
         FIELDS.CC_COMPARE_PRICE,
@@ -174,12 +176,17 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       custitem_fa_shpfy_prod_description_wh: results[0].getValue(
         FIELDS.WAREHOUSE_DESCRIPTION
       ),
-      custitem_fa_shpfy_professional_price: results[0].getValue(
-        FIELDS.PRO_PRICE
+      custitem_fa_shpfy_tn_prodtype: results[0].getValue(
+        FIELDS.TN_PRODUCT_TYPE
       ),
-      custitem_fa_shpfy_prod_description_pro: results[0].getValue(
-        FIELDS.PRO_DESCRIPTION
+      custitem_sp_shpfy_tn_events_price: results[0].getValue(
+        FIELDS.TN_EVENTS_PRICE
       ),
+      custitem_fa_shpfy_tn_description: results[0].getValue(
+        FIELDS.TN_DESCRIPTION
+      ),
+      custitem_fa_shpfy_tn_tags: results[0].getValue(FIELDS.TN_TAGS),
+
       custitem_fa_shpfy_prod_description_cc: results[0].getValue(
         FIELDS.CC_DESCRIPTION
       ),
@@ -218,8 +225,10 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
         FIELDS.WAREHOUSE_PRICE,
         FIELDS.WAREHOUSE_COMPARE_PRICE,
         FIELDS.WAREHOUSE_DESCRIPTION,
-        FIELDS.PRO_PRICE,
-        FIELDS.PRO_DESCRIPTION,
+        FIELDS.TN_PRODUCT_TYPE,
+        FIELDS.TN_EVENTS_PRICE,
+        FIELDS.TN_DESCRIPTION,
+        FIELDS.TN_TAGS,
         FIELDS.CC_DESCRIPTION,
         FIELDS.CC_PRICE,
         FIELDS.CC_COMPARE_PRICE,
@@ -332,7 +341,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     let productType: string | null | undefined = null;
     let descriptionHtml: string | null | undefined = null;
 
-    childResults.forEach((item, index) => {
+    childResults.forEach(item => {
       if (!productType) {
         productType = item.getText(productTypeField) as string;
       }
@@ -349,6 +358,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
 
   const buildShopifyProduct = (store: string, item: ItemResult) => {
     const fieldId = {
+      productType: FIELDS.PRODUCT_TYPE,
       priceLevel: '',
       productDescription: '',
       shopifyTags: '',
@@ -379,6 +389,12 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       fieldId.productDescription = FIELDS.RETAIL_DESCRIPTION;
       fieldId.shopifyTags = FIELDS.RETAIL_TAGS;
       fieldId.compareAtPrice = FIELDS.RETAIL_COMPARE_PRICE;
+    } else if (store === shopifyStore.TRES_NOIR.value) {
+      fieldId.productType = FIELDS.TN_PRODUCT_TYPE;
+      fieldId.priceLevel = FIELDS.RETAIL_PRICE;
+      fieldId.productDescription = FIELDS.TN_DESCRIPTION;
+      fieldId.shopifyTags = FIELDS.TN_TAGS;
+      fieldId.compareAtPrice = ''; // no compare at price for tn
     } else {
       throw new Error('Invalid Store');
     }
@@ -393,7 +409,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
 
     // load single record
     const itemRecord = record.load({
-      type: recordType[item.type as string],
+      type: getRecordType(item.type as string),
       id: parentId,
       isDynamic: false,
     });
@@ -406,10 +422,15 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       .filter(tag => tag !== '');
     log.debug('tags', tags);
 
+    const productTypeText =
+      itemRecord.getText(fieldId.productType) === ''
+        ? itemRecord.getText(FIELDS.PRODUCT_TYPE)
+        : itemRecord.getText(fieldId.productType);
+
     const product: ShopifyProduct = {
       vendor: itemRecord.getText(FIELDS.BRAND) as string,
       title: itemRecord.getValue(FIELDS.DISPLAY_NAME) as string,
-      productType: itemRecord.getText(FIELDS.PRODUCT_TYPE) as string,
+      productType: productTypeText as string,
       tags,
       descriptionHtml: stripInlineStyles(
         String(itemRecord.getValue(fieldId.productDescription))
@@ -482,6 +503,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       }
     } else {
       // single item
+      const priceField = fieldId.priceLevel as keyof ItemResult;
       const defaultVariant: ShopifyProductVariant = {
         optionValues: [
           {
@@ -489,7 +511,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
             name: 'Default Title',
           },
         ],
-        price: item[fieldId.priceLevel] as string,
+        price: item[priceField] as string,
         inventoryItem: {
           sku: item.itemid as string,
           measurement: {
@@ -520,13 +542,22 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     };
   };
 
+  const getRecordType = (itemType: string): record.Type => {
+    const typeMap: { [key: string]: record.Type } = {
+      Assembly: record.Type.ASSEMBLY_ITEM,
+      InvtPart: record.Type.INVENTORY_ITEM,
+      Kit: record.Type.KIT_ITEM,
+    };
+    return typeMap[itemType] || record.Type.INVENTORY_ITEM;
+  };
+
   const createPreviewObject = (store: string, sku: string) => {
     const result = getItemData(sku);
     log.debug('result', result);
     if (result) {
       const response = buildShopifyProduct(store, result);
       if (!response.success) {
-        throw new Error(response.error);
+        throw new Error(response?.error || 'Error building product preview');
       }
       return response.data;
     }
@@ -590,16 +621,35 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
     return jsonResponse;
   };
 
-  log.debug('API CONTEXT', JSON.stringify(context, null, 2));
-  doValidation(
-    [context.action, context.payload],
-    ['action', 'payload'],
-    'POST'
-  );
+  const normalizePostContext = (
+    requestBody: string | { [key: string]: unknown }
+  ): PostContext => {
+    const parsedBody: unknown =
+      typeof requestBody === 'string' ? JSON.parse(requestBody) : requestBody;
 
-  const { action, payload } = context;
+    if (
+      !parsedBody ||
+      typeof parsedBody !== 'object' ||
+      !('action' in parsedBody) ||
+      !('payload' in parsedBody)
+    ) {
+      throw new Error('Invalid request body');
+    }
+
+    return parsedBody as PostContext;
+  };
 
   try {
+    const normalizedContext = normalizePostContext(requestBody);
+    log.debug('API CONTEXT', JSON.stringify(normalizedContext, null, 2));
+    doValidation(
+      [normalizedContext.action, normalizedContext.payload],
+      ['action', 'payload'],
+      'POST'
+    );
+
+    const { action, payload } = normalizedContext;
+
     if (action === 'GET_PREVIEW') {
       const { shopifyStore, sku } = payload;
       const response = createPreviewObject(shopifyStore, sku);
@@ -616,7 +666,7 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       log.debug('CREATE_PRODUCT RESPONSE', JSON.stringify(response, null, 2));
 
       if (response?.error) {
-        throw new Error(response.error);
+        throw new Error(response?.error || 'Error creating product');
       }
 
       return {
@@ -630,12 +680,14 @@ export const post: EntryPoints.RESTlet.post = async (context: PostContext) => {
       data: null,
       error: 'Invalid action',
     };
-  } catch (err: any) {
-    log.debug('ERROR', err.message);
+  } catch (err: unknown) {
+    const errorMessage =
+      err instanceof Error ? err.message : 'Something went wrong';
+    log.debug('ERROR', errorMessage);
     return {
       success: false,
       data: null,
-      error: err.message || 'Something went wrong',
+      error: errorMessage,
     };
   }
 };

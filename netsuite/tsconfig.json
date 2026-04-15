@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "module": "amd",
     "target": "es5",
     "moduleResolution": "node",
