@@ -66,7 +66,7 @@ export function sortVariants(variants: ShopifyProductVariant[]) {
     '5xl': 8,
   };
   if (sizing) {
-    let sizeOrder = {};
+    let sizeOrder: { [key: string]: number } = {};
     // check for x-small
     const xs = variants.find(
       ({ optionValues }) =>
@@ -123,7 +123,7 @@ export function checkRequiredFields(
   isMatrix: boolean
 ) {
   const itemObjKeys = Object.keys(itemObj);
-  const itemObjErrors = [];
+  const itemObjErrors: string[] = [];
   let exclude = ['tags', 'descriptionHtml'];
   // if is matrix exclude description and productType
   // theres a bug in NetSuite where it sometimes does not allow the saving / updating of matrix items,
@@ -133,7 +133,8 @@ export function checkRequiredFields(
   }
   itemObjKeys.forEach(key => {
     if (!exclude.includes(key)) {
-      if (itemObj[key] === '' || (key === 'weight' && itemObj[key] === 0)) {
+      const value = itemObj[key as keyof ShopifyProduct];
+      if (value === '') {
         itemObjErrors.push(key);
       }
     }

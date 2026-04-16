@@ -21,12 +21,14 @@ export type ItemResult = {
   custitem_sp_brand: record.FieldValue;
   custitem_fa_shpfy_warehouse_price: record.FieldValue;
   custitem_fa_shpfy_prod_description_wh: record.FieldValue;
-  custitem_fa_shpfy_professional_price: record.FieldValue;
-  custitem_fa_shpfy_prod_description_pro: record.FieldValue;
+  custitem_sp_shpfy_tn_events_price: record.FieldValue;
+  custitem_fa_shpfy_tn_description: record.FieldValue;
+  custitem_fa_shpfy_tn_tags: record.FieldValue;
   custitem_fa_shpfy_prod_description_cc: record.FieldValue;
   custitem_fa_shpfy_price_cc: record.FieldValue;
   custitem_fa_shpfy_compare_at_price_cc: record.FieldValue;
   custitem_fa_shpfy_tags_cc: record.FieldValue;
+  custitem_fa_shpfy_tn_prodtype: record.FieldValue;
 };
 
 export type ChildItemResult = {
@@ -48,11 +50,12 @@ export type ChildItemResult = {
   custitem_fa_shpfy_warehouse_price: record.FieldValue;
   custitem_fa_shpfy_compare_at_price_wh: record.FieldValue;
   custitem_fa_shpfy_prod_description_wh: record.FieldValue;
-  custitem_fa_shpfy_professional_price: record.FieldValue;
-  custitem_fa_shpfy_prod_description_pro: record.FieldValue;
+  custitem_sp_shpfy_tn_events_price: record.FieldValue;
+  custitem_fa_shpfy_tn_description: record.FieldValue;
   custitem_fa_shpfy_prod_description_cc: record.FieldValue;
   custitem_fa_shpfy_price_cc: record.FieldValue;
   custitem_fa_shpfy_compare_at_price_cc: record.FieldValue;
+  custitem_fa_shpfy_tn_prodtype: record.FieldValue;
 };
 
 export type ShopifyProduct = {
@@ -76,7 +79,7 @@ export type ShopifyProductVariant = {
     measurement: {
       weight: {
         value: number;
-        unit: string;
+        unit: string | null;
       };
     };
   };
