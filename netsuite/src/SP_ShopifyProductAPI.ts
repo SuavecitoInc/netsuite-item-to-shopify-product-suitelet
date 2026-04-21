@@ -95,6 +95,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
     TN_EVENTS_PRICE: 'custitem_sp_shpfy_tn_events_price',
     TN_DESCRIPTION: 'custitem_fa_shpfy_tn_description',
     TN_TAGS: 'custitem_fa_shpfy_tn_tags',
+    GUNTHERS_BRAND: 'custitem_fa_shpfy_gunthers_brand',
     GUNTHERS_PRODUCT_TYPE: 'custitem_fa_shpfy_gunthers_prodtype',
     GUNTHERS_DESCRIPTION: 'custitem_fa_shpfy_gunthers_description',
     GUNTHERS_TAGS: 'custitem_fa_shpfy_gunthers_tags',
@@ -123,6 +124,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
         FIELDS.WHOLESALE_PRICE,
         FIELDS.RETAIL_DESCRIPTION,
         FIELDS.BRAND,
+        FIELDS.GUNTHERS_BRAND,
         FIELDS.GUNTHERS_PRODUCT_TYPE,
         FIELDS.GUNTHERS_DESCRIPTION,
         FIELDS.GUNTHERS_TAGS,
@@ -174,6 +176,9 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
       price2: results[0].getValue(FIELDS.WHOLESALE_PRICE),
       description: results[0].getValue(FIELDS.RETAIL_DESCRIPTION),
       custitem_sp_brand: results[0].getValue(FIELDS.BRAND),
+      custitem_fa_shpfy_gunthers_brand: results[0].getValue(
+        FIELDS.GUNTHERS_BRAND
+      ),
       custitem_fa_shpfy_gunthers_prodtype: results[0].getValue(
         FIELDS.GUNTHERS_PRODUCT_TYPE
       ),
@@ -229,6 +234,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
         FIELDS.COLOR,
         FIELDS.RETAIL_COMPARE_PRICE,
         FIELDS.WHOLESALE_COMPARE_PRICE,
+        FIELDS.GUNTHERS_BRAND,
         FIELDS.GUNTHERS_PRODUCT_TYPE,
         FIELDS.GUNTHERS_DESCRIPTION,
         FIELDS.GUNTHERS_TAGS,
@@ -365,6 +371,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
 
   const buildShopifyProduct = (store: string, item: ItemResult) => {
     const fieldId = {
+      brand: FIELDS.BRAND,
       productType: FIELDS.PRODUCT_TYPE,
       priceLevel: '',
       productDescription: '',
@@ -403,6 +410,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
       fieldId.shopifyTags = FIELDS.TN_TAGS;
       fieldId.compareAtPrice = ''; // no compare at price for tn
     } else if (store === shopifyStore.GUNTHERS.value) {
+      fieldId.brand = FIELDS.GUNTHERS_BRAND;
       fieldId.productType = FIELDS.GUNTHERS_PRODUCT_TYPE;
       fieldId.priceLevel = FIELDS.RETAIL_PRICE;
       fieldId.productDescription = FIELDS.GUNTHERS_DESCRIPTION;
@@ -441,7 +449,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
         : itemRecord.getText(fieldId.productType);
 
     const product: ShopifyProduct = {
-      vendor: itemRecord.getText(FIELDS.BRAND) as string,
+      vendor: itemRecord.getText(fieldId.brand) as string,
       title: itemRecord.getValue(FIELDS.DISPLAY_NAME) as string,
       productType: productTypeText as string,
       tags,
