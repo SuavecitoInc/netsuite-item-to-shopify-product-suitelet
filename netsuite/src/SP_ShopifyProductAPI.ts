@@ -62,6 +62,10 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
       text: 'TRES NOIR',
       value: 'tresnoir',
     },
+    GUNTHERS: {
+      text: 'GUNTHERS',
+      value: 'gunthers',
+    },
   };
 
   const FIELDS = {
@@ -91,10 +95,9 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
     TN_EVENTS_PRICE: 'custitem_sp_shpfy_tn_events_price',
     TN_DESCRIPTION: 'custitem_fa_shpfy_tn_description',
     TN_TAGS: 'custitem_fa_shpfy_tn_tags',
-    WAREHOUSE_PRICE: 'custitem_fa_shpfy_warehouse_price',
-    WAREHOUSE_COMPARE_PRICE: 'custitem_fa_shpfy_compare_at_price_wh',
-    WAREHOUSE_DESCRIPTION: 'custitem_fa_shpfy_prod_description_wh',
-    WAREHOUSE_TAGS: 'custitem_fa_shpfy_tags_wh',
+    GUNTHERS_PRODUCT_TYPE: 'custitem_fa_shpfy_gunthers_prodtype',
+    GUNTHERS_DESCRIPTION: 'custitem_fa_shpfy_gunthers_description',
+    GUNTHERS_TAGS: 'custitem_fa_shpfy_gunthers_tags',
     PRODUCT_TYPE: 'custitem_fa_shpfy_prodtype',
     SIZE: 'custitem_sp_size',
     COLOR: 'custitem_sp_color',
@@ -120,8 +123,9 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
         FIELDS.WHOLESALE_PRICE,
         FIELDS.RETAIL_DESCRIPTION,
         FIELDS.BRAND,
-        FIELDS.WAREHOUSE_PRICE,
-        FIELDS.WAREHOUSE_DESCRIPTION,
+        FIELDS.GUNTHERS_PRODUCT_TYPE,
+        FIELDS.GUNTHERS_DESCRIPTION,
+        FIELDS.GUNTHERS_TAGS,
         FIELDS.TN_PRODUCT_TYPE,
         FIELDS.TN_EVENTS_PRICE,
         FIELDS.TN_DESCRIPTION,
@@ -170,11 +174,14 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
       price2: results[0].getValue(FIELDS.WHOLESALE_PRICE),
       description: results[0].getValue(FIELDS.RETAIL_DESCRIPTION),
       custitem_sp_brand: results[0].getValue(FIELDS.BRAND),
-      custitem_fa_shpfy_warehouse_price: results[0].getValue(
-        FIELDS.WAREHOUSE_PRICE
+      custitem_fa_shpfy_gunthers_prodtype: results[0].getValue(
+        FIELDS.GUNTHERS_PRODUCT_TYPE
       ),
-      custitem_fa_shpfy_prod_description_wh: results[0].getValue(
-        FIELDS.WAREHOUSE_DESCRIPTION
+      custitem_fa_shpfy_gunthers_description: results[0].getValue(
+        FIELDS.GUNTHERS_DESCRIPTION
+      ),
+      custitem_fa_shpfy_gunthers_tags: results[0].getValue(
+        FIELDS.GUNTHERS_TAGS
       ),
       custitem_fa_shpfy_tn_prodtype: results[0].getValue(
         FIELDS.TN_PRODUCT_TYPE
@@ -222,9 +229,9 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
         FIELDS.COLOR,
         FIELDS.RETAIL_COMPARE_PRICE,
         FIELDS.WHOLESALE_COMPARE_PRICE,
-        FIELDS.WAREHOUSE_PRICE,
-        FIELDS.WAREHOUSE_COMPARE_PRICE,
-        FIELDS.WAREHOUSE_DESCRIPTION,
+        FIELDS.GUNTHERS_PRODUCT_TYPE,
+        FIELDS.GUNTHERS_DESCRIPTION,
+        FIELDS.GUNTHERS_TAGS,
         FIELDS.TN_PRODUCT_TYPE,
         FIELDS.TN_EVENTS_PRICE,
         FIELDS.TN_DESCRIPTION,
@@ -395,6 +402,12 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
       fieldId.productDescription = FIELDS.TN_DESCRIPTION;
       fieldId.shopifyTags = FIELDS.TN_TAGS;
       fieldId.compareAtPrice = ''; // no compare at price for tn
+    } else if (store === shopifyStore.GUNTHERS.value) {
+      fieldId.productType = FIELDS.GUNTHERS_PRODUCT_TYPE;
+      fieldId.priceLevel = FIELDS.RETAIL_PRICE;
+      fieldId.productDescription = FIELDS.GUNTHERS_DESCRIPTION;
+      fieldId.shopifyTags = FIELDS.GUNTHERS_TAGS;
+      fieldId.compareAtPrice = ''; // no compare at price for gunthers
     } else {
       throw new Error('Invalid Store');
     }
