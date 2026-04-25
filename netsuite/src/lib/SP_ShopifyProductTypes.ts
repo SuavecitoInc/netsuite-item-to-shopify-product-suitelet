@@ -19,7 +19,7 @@ export type ItemResult = {
   price2: record.FieldValue;
   description: record.FieldValue;
   custitem_sp_brand: record.FieldValue;
-  custitem_fa_shpfy_gunthers_brand: record.FieldValue;
+  custitem_fa_shpfy_gunthers_brands: record.FieldValue;
   custitem_fa_shpfy_gunthers_prodtype: record.FieldValue;
   custitem_fa_shpfy_gunthers_description: record.FieldValue;
   custitem_fa_shpfy_gunthers_tags: record.FieldValue;
