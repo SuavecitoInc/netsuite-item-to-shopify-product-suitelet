@@ -36,6 +36,14 @@ type PostContext = {
   };
 };
 
+type ErrorLike = {
+  name?: unknown;
+  message?: unknown;
+  details?: unknown;
+  stack?: unknown;
+  type?: unknown;
+};
+
 export const post: EntryPoints.RESTlet.post = async requestBody => {
   const shopifyStore = {
     RETAIL: {
@@ -95,7 +103,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
     TN_EVENTS_PRICE: 'custitem_sp_shpfy_tn_events_price',
     TN_DESCRIPTION: 'custitem_fa_shpfy_tn_description',
     TN_TAGS: 'custitem_fa_shpfy_tn_tags',
-    GUNTHERS_BRAND: 'custitem_fa_shpfy_gunthers_brand',
+    GUNTHERS_BRAND: 'custitem_fa_shpfy_gunthers_brands',
     GUNTHERS_PRODUCT_TYPE: 'custitem_fa_shpfy_gunthers_prodtype',
     GUNTHERS_DESCRIPTION: 'custitem_fa_shpfy_gunthers_description',
     GUNTHERS_TAGS: 'custitem_fa_shpfy_gunthers_tags',
@@ -176,7 +184,7 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
       price2: results[0].getValue(FIELDS.WHOLESALE_PRICE),
       description: results[0].getValue(FIELDS.RETAIL_DESCRIPTION),
       custitem_sp_brand: results[0].getValue(FIELDS.BRAND),
-      custitem_fa_shpfy_gunthers_brand: results[0].getValue(
+      custitem_fa_shpfy_gunthers_brands: results[0].getValue(
         FIELDS.GUNTHERS_BRAND
       ),
       custitem_fa_shpfy_gunthers_prodtype: results[0].getValue(
@@ -660,6 +668,29 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
     return parsedBody as PostContext;
   };
 
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof Error && err.message) {
+      return err.message;
+    }
+
+    if (err && typeof err === 'object') {
+      const errorLike = err as ErrorLike;
+
+      const message =
+        typeof errorLike.message === 'string' ? errorLike.message : '';
+      const details =
+        typeof errorLike.details === 'string' ? errorLike.details : '';
+      const name = typeof errorLike.name === 'string' ? errorLike.name : '';
+
+      const parts = [name, message, details].filter(Boolean);
+      if (parts.length > 0) {
+        return parts.join(' | ');
+      }
+    }
+
+    return 'Something went wrong';
+  };
+
   try {
     const normalizedContext = normalizePostContext(requestBody);
     log.debug('API CONTEXT', JSON.stringify(normalizedContext, null, 2));
@@ -702,9 +733,14 @@ export const post: EntryPoints.RESTlet.post = async requestBody => {
       error: 'Invalid action',
     };
   } catch (err: unknown) {
-    const errorMessage =
-      err instanceof Error ? err.message : 'Something went wrong';
-    log.debug('ERROR', errorMessage);
+    const errorMessage = getErrorMessage(err);
+    log.error({
+      title: 'RESTLET_ERROR',
+      details: {
+        message: errorMessage,
+        error: err,
+      },
+    });
     return {
       success: false,
       data: null,
