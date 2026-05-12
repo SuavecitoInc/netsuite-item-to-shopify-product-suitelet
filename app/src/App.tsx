@@ -176,9 +176,6 @@ function App() {
           {currentView === 'preview' && preview && (
             <div className="max-w-full">
               <h3 className="font-bold uppercase">Preview Product</h3>
-              <div className="mb-5!">
-                <CodeSnippet snippet={preview} />
-              </div>
               <div className="flex flex-row gap-2">
                 <button
                   type="button"
@@ -194,6 +191,9 @@ function App() {
                 >
                   Cancel
                 </button>
+              </div>
+              <div className="mb-5!">
+                <CodeSnippet snippet={preview} />
               </div>
             </div>
           )}
